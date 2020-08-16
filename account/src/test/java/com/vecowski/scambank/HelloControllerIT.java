@@ -1,4 +1,4 @@
-package com.example.springboot;
+package com.vecowski.scambank;
 
 import static org.assertj.core.api.Assertions.*;
 

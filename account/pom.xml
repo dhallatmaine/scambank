@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.vecowski</groupId>
-	<artifactId>scambank</artifactId>
+	<artifactId>scambank-account</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>South Carolina Access Mutual</name>
-	<description>Fake bank microservices</description>
+	<name>South Carolina Access Mutual Account</name>
+	<description>Fake bank microservice for accounts</description>
 
 	<properties>
 		<java.version>1.8</java.version>
