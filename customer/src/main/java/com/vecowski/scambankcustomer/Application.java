@@ -1,4 +1,4 @@
-package com.vecowski.scambank;
+package com.vecowski.scambankcustomer;
 
 import java.util.Arrays;
 

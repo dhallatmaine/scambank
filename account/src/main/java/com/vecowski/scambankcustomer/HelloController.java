@@ -1,4 +1,4 @@
-package com.vecowski.scambank;
+package com.vecowski.scambankcustomer;
 
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
