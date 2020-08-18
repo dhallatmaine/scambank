@@ -19,11 +19,11 @@ public class Customer {
     private UUID id;
 
     @NotBlank
-    @Size(min = 1, max = 100)
+    @Size(min = 1, max = 255)
     private String firstName;
 
     @NotBlank
-    @Size(min = 1, max = 100)
+    @Size(min = 1, max = 255)
     private String lastName;
 
 }

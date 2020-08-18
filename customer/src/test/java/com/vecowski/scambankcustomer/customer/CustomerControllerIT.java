@@ -1,16 +1,18 @@
 package com.vecowski.scambankcustomer.customer;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.util.UUID;
-
 import com.vecowski.scambankcustomer.PostgresMockConfiguration;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -19,6 +21,26 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ContextConfiguration(classes = { PostgresMockConfiguration.class })
 public class CustomerControllerIT {
+
+    @Test
+    public void getAllCustomers() {
+        givenCreateCustomerDto();
+        givenCreatedCustomer();
+        whenGetAllCustomers();
+        thenCustomersAreReturned();
+    }
+
+    @Test
+    public void createCustomer() {
+        givenCreateCustomerDto();
+        whenCreateCustomer();
+        thenCustomerIsCreated();
+    }
+
+    @Before
+    public void before() {
+        customerRepository.deleteAllInBatch();
+    }
 
     @LocalServerPort
     private Integer port;
@@ -29,18 +51,57 @@ public class CustomerControllerIT {
     @Autowired
     private CustomerRepository customerRepository;
 
-    @Test
-    public void getAllCustomers() {
-        Customer customer = new Customer()
-                .setId(UUID.randomUUID())
-                .setFirstName("Test1")
-                .setLastName("Test2");
-        customerRepository.save(customer);
+    @Autowired
+    private CustomerService customerService;
 
-        ResponseEntity<CustomerListDto> response =
-                testRestTemplate.getForEntity("http://localhost:" + port + "/customers", CustomerListDto.class);
+    // Inputs
+    private CreateCustomerDto createCustomerDto;
 
-        CustomerListDto customerListDto = response.getBody();
+    // Outputs
+    private ResponseEntity<CustomerDto> createCustomerResponse;
+    private ResponseEntity<CustomerListDto> getAllCustomersResponse;
+
+    /*
+     * GIVEN
+     */
+    private void givenCreateCustomerDto() {
+        createCustomerDto = RandomCustomerUtil.randomCreateCustomerDto();
+    }
+
+    private void givenCreatedCustomer() {
+        customerService.createCustomer(createCustomerDto);
+    }
+
+    /*
+     * WHEN
+     */
+    private void whenCreateCustomer() {
+        createCustomerResponse = testRestTemplate.postForEntity(
+                "http://localhost:" + port + "/customer",
+                createCustomerDto,
+                CustomerDto.class);
+    }
+
+    private void whenGetAllCustomers() {
+        getAllCustomersResponse = testRestTemplate.getForEntity(
+                "http://localhost:" + port + "/customer/all",
+                CustomerListDto.class);
+    }
+
+    /*
+     * THEN
+     */
+    private void thenCustomerIsCreated() {
+        assertEquals(HttpStatus.OK.value(), createCustomerResponse.getStatusCodeValue());
+        CustomerDto customerDto = createCustomerResponse.getBody();
+        assertNotNull(customerDto);
+        assertEquals(createCustomerDto.getFirstName(), customerDto.getFirstName());
+        assertEquals(createCustomerDto.getLastName(), customerDto.getLastName());
+    }
+
+    private void thenCustomersAreReturned() {
+        assertEquals(HttpStatus.OK.value(), getAllCustomersResponse.getStatusCodeValue());
+        CustomerListDto customerListDto = getAllCustomersResponse.getBody();
         assertNotNull(customerListDto);
         assertNotNull(customerListDto.getCustomers());
     }
