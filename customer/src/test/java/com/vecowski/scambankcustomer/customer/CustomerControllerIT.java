@@ -4,7 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import com.vecowski.scambankcustomer.PostgresMockConfiguration;
-import org.apache.commons.lang3.RandomStringUtils;
+import com.vecowski.scambankcustomer.customer.address.AddressDto;
+import com.vecowski.scambankcustomer.customer.address.AddressRepository;
+import com.vecowski.scambankcustomer.customer.address.CreateAddressDto;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,8 +39,18 @@ public class CustomerControllerIT {
         thenCustomerIsCreated();
     }
 
+    @Test
+    public void createAddress() {
+        givenCreateCustomerDto();
+        givenCreatedCustomer();
+        givenCreateAddressDto();
+        whenCreateAddress();
+        thenAddressIsCreated();
+    }
+
     @Before
     public void before() {
+        addressRepository.deleteAllInBatch();
         customerRepository.deleteAllInBatch();
     }
 
@@ -52,14 +64,20 @@ public class CustomerControllerIT {
     private CustomerRepository customerRepository;
 
     @Autowired
+    private AddressRepository addressRepository;
+
+    @Autowired
     private CustomerService customerService;
 
     // Inputs
     private CreateCustomerDto createCustomerDto;
+    private CreateAddressDto createAddressDto;
 
     // Outputs
+    private Customer createdCustomer;
     private ResponseEntity<CustomerDto> createCustomerResponse;
     private ResponseEntity<CustomerListDto> getAllCustomersResponse;
+    private ResponseEntity<AddressDto> createAddressResponse;
 
     /*
      * GIVEN
@@ -69,7 +87,11 @@ public class CustomerControllerIT {
     }
 
     private void givenCreatedCustomer() {
-        customerService.createCustomer(createCustomerDto);
+        createdCustomer = customerService.createCustomer(createCustomerDto);
+    }
+
+    private void givenCreateAddressDto() {
+        createAddressDto = RandomCustomerUtil.randomCreateAddressDto();
     }
 
     /*
@@ -88,6 +110,13 @@ public class CustomerControllerIT {
                 CustomerListDto.class);
     }
 
+    private void whenCreateAddress() {
+        createAddressResponse = testRestTemplate.postForEntity(
+                "http://localhost:" + port + "/customer/" + createdCustomer.getId() + "/address",
+                createAddressDto,
+                AddressDto.class);
+    }
+
     /*
      * THEN
      */
@@ -104,6 +133,20 @@ public class CustomerControllerIT {
         CustomerListDto customerListDto = getAllCustomersResponse.getBody();
         assertNotNull(customerListDto);
         assertNotNull(customerListDto.getCustomers());
+    }
+
+    private void thenAddressIsCreated() {
+        assertEquals(HttpStatus.OK.value(), createAddressResponse.getStatusCodeValue());
+        AddressDto addressDto = createAddressResponse.getBody();
+        assertNotNull(addressDto);
+        assertEquals(createAddressDto.getLine1(), addressDto.getLine1());
+        assertEquals(createAddressDto.getLine2(), addressDto.getLine2());
+        assertEquals(createAddressDto.getLine3(), addressDto.getLine3());
+        assertEquals(createAddressDto.getCity(), addressDto.getCity());
+        assertEquals(createAddressDto.getState(), addressDto.getState());
+        assertEquals(createAddressDto.getCountry(), addressDto.getCountry());
+        assertEquals(createAddressDto.getZipCode(), addressDto.getZipCode());
+        assertEquals(createdCustomer.getId(), addressDto.getCustomerId());
     }
 
 }

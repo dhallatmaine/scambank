@@ -4,11 +4,19 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.UUID;
 
 @Getter
 @Setter
-public class CreateAddressDto {
+public class AddressDto {
+
+    @NotNull
+    private UUID id;
+
+    @NotNull
+    private UUID customerId;
 
     @NotBlank
     @Size(min = 1, max = 255)

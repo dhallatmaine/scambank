@@ -11,15 +11,15 @@ public class AddressService {
     @Autowired
     private AddressRepository addressRepository;
 
-    public Address createAddress(CreateAddressDto createAddressDto) {
-        Address address = from(createAddressDto);
+    public Address createAddress(final UUID customerId, final CreateAddressDto createAddressDto) {
+        Address address = from(createAddressDto)
+                .setCustomerId(customerId);
         return addressRepository.save(address);
     }
 
-    private Address from(CreateAddressDto createAddressDto) {
+    private Address from(final CreateAddressDto createAddressDto) {
         return new Address()
                 .setId(UUID.randomUUID())
-                .setCustomerId(createAddressDto.getCustomerId())
                 .setLine1(createAddressDto.getLine1())
                 .setLine2(createAddressDto.getLine2())
                 .setLine3(createAddressDto.getLine3())

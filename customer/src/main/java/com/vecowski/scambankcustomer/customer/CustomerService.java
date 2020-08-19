@@ -3,6 +3,7 @@ package com.vecowski.scambankcustomer.customer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -14,6 +15,10 @@ public class CustomerService {
     public Customer createCustomer(CreateCustomerDto createCustomerDto) {
         Customer customer = from(createCustomerDto);
         return customerRepository.save(customer);
+    }
+
+    public List<Customer> findAllCustomers() {
+        return customerRepository.findAll();
     }
 
     private Customer from(CreateCustomerDto createCustomerDto) {

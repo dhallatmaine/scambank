@@ -8,9 +8,9 @@ CREATE TABLE customer (
 CREATE TABLE address (
   id UUID NOT NULL,
   customer_id UUID NOT NULL,
-  line_1 VARCHAR(255) NOT NULL,
-  line_2 VARCHAR(255) NULL,
-  line_3 VARCHAR(255) NULL,
+  line1 VARCHAR(255) NOT NULL,
+  line2 VARCHAR(255) NULL,
+  line3 VARCHAR(255) NULL,
   city VARCHAR(255) NOT NULL,
   state VARCHAR(255) NOT NULL,
   zip_code VARCHAR(9) NOT NULL,
